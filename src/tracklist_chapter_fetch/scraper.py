@@ -2,6 +2,8 @@
 Web scraping functionality for extracting tracklists from 1001tracklists.com.
 """
 
+from fake_useragent import UserAgent
+
 
 class ScrapingError(Exception):
     """Exception raised for scraping errors."""
@@ -16,3 +18,4 @@ class TracklistScraper:
         """
         Initialize the scraper.
         """
+        self.ua: UserAgent = UserAgent()

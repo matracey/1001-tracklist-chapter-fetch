@@ -3,7 +3,7 @@ name = "tracklist-chapter-fetch"
 version = "0.1.0"
 description = "Builds a FFMETADATA chapter list from a 1001 Tracklists tracklist URL."
 authors = [{ name = "Martin Tracey", email = "matracey@outlook.ie" }]
-dependencies = []
+dependencies = ["fake-useragent>=2.1.0"]
 requires-python = ">=3.12"
 readme = "README.md"
 license = { text = "MIT" }
