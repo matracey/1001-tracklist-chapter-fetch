@@ -32,6 +32,25 @@ A command-line application for extracting tracklists from [1001tracklists.com](h
    pdm install
    ```
 
+## Usage
+
+### Basic Usage
+
+   ```shell
+pdm tracklist_chapter_fetch URL [OPTIONS]
+```
+
+Where `URL` is the 1001tracklists.com URL you want to extract the tracklist from.
+
+### Options
+
+```plaintext
+-o, --output OUTPUT_FILE  Output file path (default: output.ffmetadata)
+-q, --quiet               Suppress progress messages
+-v, --verbose             Show detailed processing information
+-h, --help                Show help message
+```
+
 ## Development
 
 ### Technologies Used
