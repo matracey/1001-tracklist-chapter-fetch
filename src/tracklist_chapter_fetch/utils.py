@@ -13,6 +13,11 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 
+class ValidationError(Exception):
+    """Exception raised for validation errors."""
+
+
+
 def setup_logging(verbose: bool = False, quiet: bool = False) -> None:
     """
     Configure logging level based on command line arguments.
