@@ -5,7 +5,11 @@ description = "Builds a FFMETADATA chapter list from a 1001 Tracklists tracklist
 authors = [
     { name = "Martin Tracey", email = "matracey@outlook.ie" },
 ]
-dependencies = []
+dependencies = [
+    "scrapling>=0.1.0",
+    "requests>=2.28.0",
+    "beautifulsoup4>=4.11.0",
+]
 requires-python = ">=3.12"
 readme = "README.md"
 license = { text = "MIT" }
