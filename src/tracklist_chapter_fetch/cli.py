@@ -7,7 +7,7 @@ import sys
 import traceback
 from typing import List, Optional
 
-from .utils import logger, setup_logging
+from .utils import ValidationError, logger, setup_logging, validate_url
 
 
 def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
@@ -64,8 +64,15 @@ def main(args: Optional[List[str]] = None) -> int:
     setup_logging(verbose=parsed_args.verbose, quiet=parsed_args.quiet)
 
     try:
+        # Validate URL
+        logger.info("Processing tracklist URL: %s", parsed_args.url)
+        validate_url(parsed_args.url)
+
         return 0
 
+    except ValidationError as e:
+        logger.error("Validation error: %s", str(e))
+        return 1
     except (OSError, RuntimeError) as e:
         logger.error("Unexpected error: %s", str(e))
         if parsed_args.verbose:
