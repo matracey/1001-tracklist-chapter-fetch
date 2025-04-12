@@ -2,6 +2,7 @@
 Web scraping functionality for extracting tracklists from 1001tracklists.com.
 """
 
+import requests
 from fake_useragent import UserAgent
 
 
@@ -19,3 +20,5 @@ class TracklistScraper:
         Initialize the scraper.
         """
         self.ua: UserAgent = UserAgent()
+        self.session = requests.Session()
+        self.session.headers.update({"User-Agent": self.ua.chrome})
