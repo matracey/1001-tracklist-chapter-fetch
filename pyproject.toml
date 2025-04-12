@@ -31,3 +31,4 @@ distribution = true
 
 [tool.pdm.scripts]
 lint = "flake8"
+tracklist_chapter_fetch = "python -m src.tracklist_chapter_fetch"
