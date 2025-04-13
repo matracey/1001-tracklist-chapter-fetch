@@ -51,6 +51,27 @@ Where `URL` is the 1001tracklists.com URL you want to extract the tracklist from
 -h, --help                Show help message
 ```
 
+### Example
+
+```shell
+pdm tracklist_chapter_fetch https://www.1001tracklists.com/tracklist/295f7nbt/steve-angello-an21-size-sound-system-055-2025-03-20.html -o my_chapters.ffmetadata
+```
+
+This will:
+
+1. Download the tracklist from the specified URL using Scrapling's stealth capabilities
+2. Extract track names, artists, and timestamps
+3. Generate an FFMETADATA file with chapter markers
+4. Save the file to `my_chapters.ffmetadata`
+
+## Using with FFmpeg
+
+To add chapter metadata to an audio file using the generated FFMETADATA file:
+
+```shell
+ffmpeg -i input_audio.mp3 -i output.ffmetadata -map_metadata 1 -codec copy output_with_chapters.mp3
+```
+
 ## Development
 
 ### Technologies Used
