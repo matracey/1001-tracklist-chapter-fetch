@@ -74,6 +74,22 @@ ffmpeg -i input_audio.mp3 -i output.ffmetadata -map_metadata 1 -codec copy outpu
 
 ## Development
 
+### Project Structure
+
+```plaintext
+/
+  /src
+    /tracklist_chapter_fetch     # Main package
+      __init__.py                # Package initialization
+      cli.py                     # Command-line interface
+      scraper.py                 # Tracklist scraping with Scrapling
+      metadata.py                # FFMETADATA generation
+      utils.py                   # Helper utilities
+  /tests                         # Test files
+  pyproject.toml                 # PDM project configuration
+  README.md                      # Project documentation
+```
+
 ### Technologies Used
 
 - **Scrapling**: A high-performance, intelligent web scraping library that adapts to website changes and provides undetectable requests.
