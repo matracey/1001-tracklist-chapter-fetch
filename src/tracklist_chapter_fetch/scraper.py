@@ -60,6 +60,52 @@ class TracklistScraper:
         except requests.RequestException as e:
             raise ScrapingError(f"Error fetching page: {str(e)}") from e
 
+    def __extract_tracks__(self, track_items: List[Any]) -> List[Dict[str, Any]]:
+        """
+        Extract track information from track items.
+
+        Args:
+            track_items: List of track item elements
+
+        Returns:
+            List of track dictionaries
+        """
+        timestamp_selectors = [
+            ".tlpCuePointTimecode .tcWrap",
+            ".cue-time",
+            ".time",
+            ".timestamp",
+            ".tl-time",
+        ]
+        title_selectors = [".trackValue", ".tl-title", ".title", ".track-title"]
+
+        tracks = []
+        for item in track_items:
+            try:
+                timestamp = self.__extract_timestamp__(item, timestamp_selectors)
+                track_full_title = self.__extract_title__(item, title_selectors)
+
+                track_info = {
+                    "title": track_full_title,
+                    "artist": None,
+                    "timestamp": timestamp,
+                }
+
+                if timestamp:
+                    tracks.append(track_info)
+                    logger.debug("Added track: %s (%s)", track_full_title, timestamp)
+                else:
+                    logger.warning(
+                        "Skipping track without timestamp: %s", track_full_title
+                    )
+            except (AttributeError, IndexError, ValueError) as e:
+                logger.warning("Error parsing track item: %s", str(e))
+
+        if not tracks:
+            raise ScrapingError("Failed to parse tracklist: No tracks found")
+
+        return tracks
+
     def __extract_timestamp__(self, item: Any, selectors: List[str]) -> str:
         """
         Extract the timestamp from a track item.
