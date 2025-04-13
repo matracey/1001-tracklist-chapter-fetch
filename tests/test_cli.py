@@ -16,6 +16,22 @@ class TestCLI(unittest.TestCase):
         self.assertFalse(args.quiet)
         self.assertFalse(args.verbose)
 
+    def test_parse_args_all_options(self):
+        """Test argument parsing with all options specified."""
+        args = parse_args(
+            [
+                "https://www.1001tracklists.com/test",
+                "-o",
+                "custom.ffmetadata",
+                "-q",
+                "-v",
+            ]
+        )
+        self.assertEqual(args.url, "https://www.1001tracklists.com/test")
+        self.assertEqual(args.output_file, "custom.ffmetadata")
+        self.assertTrue(args.quiet)
+        self.assertTrue(args.verbose)
+
 
 if __name__ == "__main__":
     unittest.main()
