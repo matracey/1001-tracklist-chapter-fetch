@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from src.tracklist_chapter_fetch.cli import main, parse_args
+from src.tracklist_chapter_fetch.scraper import ScrapingError
 from src.tracklist_chapter_fetch.utils import ValidationError
 
 
@@ -74,6 +75,22 @@ class TestCLI(unittest.TestCase):
         result = main(["http://invalid.url"])
 
         self.assertEqual(result, 1)  # Should return validation error code
+
+    @patch("src.tracklist_chapter_fetch.cli.validate_url")
+    @patch("src.tracklist_chapter_fetch.cli.TracklistScraper")
+    def test_main_scraping_error(self, mock_scraper, mock_validate):
+        """Test handling of scraping errors."""
+        mock_validate.return_value = True
+
+        mock_scraper_instance = MagicMock()
+        mock_scraper_instance.get_tracklist.side_effect = ScrapingError(
+            "Scraping failed"
+        )
+        mock_scraper.return_value = mock_scraper_instance
+
+        result = main(["https://www.1001tracklists.com/test"])
+
+        self.assertEqual(result, 2)  # Should return scraping error code
 
 
 if __name__ == "__main__":
