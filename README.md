@@ -95,6 +95,12 @@ ffmpeg -i input_audio.mp3 -i output.ffmetadata -map_metadata 1 -codec copy outpu
 - **Scrapling**: A high-performance, intelligent web scraping library that adapts to website changes and provides undetectable requests.
 - **FFMPEG Metadata format**: Standard format for adding chapter metadata to audio files.
 
+### Running Tests
+
+```shell
+pdm run pytest
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
