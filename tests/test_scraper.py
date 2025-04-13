@@ -158,5 +158,29 @@ class TestScraper(unittest.TestCase):
         with self.assertRaises(ScrapingError):
             self.scraper.parse_tracklist(mock_adaptor)
 
+    @patch.object(TracklistScraper, "fetch_page")
+    @patch.object(TracklistScraper, "parse_tracklist")
+    def test_get_tracklist(self, mock_parse, mock_fetch):
+        """Test the full get_tracklist method with mocks."""
+        # Setup mocks
+        mock_adaptor = MagicMock(spec=Adaptor)
+        mock_fetch.return_value = mock_adaptor
+        mock_parse.return_value = [
+            {"title": "Artist1 - Track1", "artist": None, "timestamp": "0:30"},
+            {"title": "Artist2 - Track2", "artist": None, "timestamp": "3:45"},
+        ]
+
+        # Test function
+        url = "https://www.1001tracklists.com/test"
+        result = self.scraper.get_tracklist(url)
+
+        # Assertions
+        mock_fetch.assert_called_once_with(url)
+        mock_parse.assert_called_once_with(mock_adaptor)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]["title"], "Artist1 - Track1")
+        self.assertEqual(result[1]["timestamp"], "3:45")
+
+
 if __name__ == "__main__":
     unittest.main()
