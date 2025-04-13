@@ -80,3 +80,21 @@ def __get_track_timings__(
         end_ms = start_ms + (4 * 60 * 1000)
 
     return start_ms, end_ms
+
+
+def __format_chapter_title__(track: Dict[str, Any]) -> str:
+    """
+    Format the chapter title from track information.
+
+    Args:
+        track: Track dictionary with 'artist' and 'title' fields
+
+    Returns:
+        Formatted chapter title string
+    """
+    title = track.get("title", "Unknown Title")
+    artist = track.get("artist")
+
+    if artist:
+        return f"{artist} - {title}"
+    return title
