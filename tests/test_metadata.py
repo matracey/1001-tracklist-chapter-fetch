@@ -2,9 +2,15 @@
 Tests for the metadata module.
 """
 
+import os
+import tempfile
 import unittest
 
-from src.tracklist_chapter_fetch.metadata import MetadataError, generate_ffmetadata
+from src.tracklist_chapter_fetch.metadata import (
+    MetadataError,
+    generate_ffmetadata,
+    save_metadata_to_file,
+)
 
 
 class TestMetadata(unittest.TestCase):
@@ -38,6 +44,31 @@ class TestMetadata(unittest.TestCase):
         """Test error handling with empty track list."""
         with self.assertRaises(MetadataError):
             generate_ffmetadata([])
+
+    def test_save_metadata_to_file(self):
+        """Test saving metadata to a file."""
+        test_metadata = (
+            ";FFMETADATA1\n[CHAPTER]\nTIMEBASE=1/1000\nSTART=0\nEND=1000\ntitle=Test"
+        )
+
+        # Create a temporary file for testing
+        with tempfile.NamedTemporaryFile(delete=False) as tmp:
+            temp_path = tmp.name
+
+        try:
+            save_metadata_to_file(test_metadata, temp_path)
+
+            # Check that the file exists and has the correct content
+            self.assertTrue(os.path.exists(temp_path))
+
+            with open(temp_path, "r", encoding="utf-8") as f:
+                content = f.read()
+                self.assertEqual(content, test_metadata)
+
+        finally:
+            # Clean up the temporary file
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
 
 
 if __name__ == "__main__":
