@@ -83,6 +83,68 @@ class TestScraper(unittest.TestCase):
         with self.assertRaises(ScrapingError):
             self.scraper.fetch_page("https://www.1001tracklists.com/nonexistent")
 
+    def test_parse_tracklist(self):
+        """Test parsing a tracklist from HTML."""
+        # Create a mock Adaptor object
+        mock_adaptor = MagicMock(spec=Adaptor)
+        mock_adaptor.body = self.sample_html
+
+        # Mock container
+        mock_container = MagicMock()
+
+        # Mock track items
+        mock_track_item1 = self.__create_mock_track_item__("0:34", "Track Title 1")
+        mock_track_item2 = self.__create_mock_track_item__("3:53", "Track Title 2")
+        mock_track_item3 = self.__create_mock_track_item__("7:42", "Track Title 3")
+
+        # Mock meta title
+        mock_title = MagicMock()
+        mock_title.text = "Test Tracklist"
+        mock_title.get.return_value = "Test Tracklist"
+
+        # Set up mock returns
+        mock_adaptor.css.side_effect = lambda selector: {
+            ".tlpContainer": [mock_container],
+            "meta[property='og:title']": [mock_title],
+            "title": (
+                [mock_title] if "meta[property='og:title']" not in selector else []
+            ),
+            ".tlpItem": [mock_track_item1, mock_track_item2, mock_track_item3],
+        }.get(selector, [])
+
+        mock_container.css.side_effect = lambda selector: {
+            ".tlpItem": [mock_track_item1, mock_track_item2, mock_track_item3]
+        }.get(selector, [])
+
+        # Call the function
+        tracks = self.scraper.parse_tracklist(mock_adaptor)
+
+        # Check results
+        self.assertEqual(len(tracks), 3)
+        self.assertEqual(tracks[0]["title"], "Track Title 1")
+        self.assertEqual(tracks[0]["timestamp"], "0:34")
+        self.assertEqual(tracks[1]["title"], "Track Title 2")
+        self.assertEqual(tracks[2]["timestamp"], "7:42")
+
+    def __create_mock_track_item__(self, timestamp, title):
+        """Helper to create mock track items for testing."""
+        mock_item = MagicMock()
+
+        # Mock timestamp element
+        mock_timestamp_elem = MagicMock()
+        mock_timestamp_elem.text = timestamp
+
+        # Mock title element
+        mock_title_elem = MagicMock()
+        mock_title_elem.text = title
+
+        # Configure mock item's css method to return different elements
+        mock_item.css.side_effect = lambda selector: {
+            ".tlpCuePointTimecode .tcWrap": [mock_timestamp_elem] if timestamp else [],
+            ".trackValue": [mock_title_elem] if title else [],
+        }.get(selector, [])
+
+        return mock_item
 
 if __name__ == "__main__":
     unittest.main()
