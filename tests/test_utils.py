@@ -23,6 +23,19 @@ class TestUtils(unittest.TestCase):
             except ValidationError:
                 self.fail(f"validate_url raised ValidationError unexpectedly for {url}")
 
+    def test_validate_url_invalid(self):
+        """Test URL validation with invalid URLs."""
+        invalid_urls = [
+            "",
+            "not-a-url",
+            "http://example.com",
+            "https://www.otherdomain.com/tracklist/12345",
+        ]
+
+        for url in invalid_urls:
+            with self.assertRaises(ValidationError):
+                validate_url(url)
+
 
 if __name__ == "__main__":
     unittest.main()
