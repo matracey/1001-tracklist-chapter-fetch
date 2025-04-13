@@ -3,6 +3,7 @@ Utility functions for Tracklist Chapter Fetch.
 """
 
 import logging
+from typing import Optional
 from urllib.parse import urlparse
 
 # Configure logging
@@ -63,3 +64,32 @@ def setup_logging(verbose: bool = False, quiet: bool = False) -> None:
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
+
+
+def format_time_ms(time_str: str) -> Optional[int]:
+    """
+    Convert time string (MM:SS) to milliseconds.
+
+    Args:
+        time_str: Time string in MM:SS format
+
+    Returns:
+        Time in milliseconds or None if conversion fails
+    """
+    try:
+        # Handle various time formats
+        if ":" in time_str:
+            parts = time_str.split(":")
+            if len(parts) == 2:  # MM:SS
+                minutes, seconds = map(int, parts)
+                return (minutes * 60 + seconds) * 1000
+            if len(parts) == 3:  # HH:MM:SS
+                hours, minutes, seconds = map(int, parts)
+                return (hours * 3600 + minutes * 60 + seconds) * 1000
+        else:
+            # Try direct conversion for seconds only
+            return int(time_str) * 1000
+
+    except (ValueError, TypeError) as e:
+        logger.warning("Failed to convert time '%s': %s", time_str, str(e))
+        return None
