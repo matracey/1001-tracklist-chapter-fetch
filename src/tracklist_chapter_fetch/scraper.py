@@ -59,6 +59,25 @@ class TracklistScraper:
         except requests.RequestException as e:
             raise ScrapingError(f"Error fetching page: {str(e)}") from e
 
+    def __extract_title__(self, item: Any, selectors: List[str]) -> str:
+        """
+        Extract the title from a track item.
+
+        Args:
+            item: Track item element
+            selectors: List of CSS selectors to try
+
+        Returns:
+            The extracted title
+        """
+        for selector in selectors:
+            title_elem = item.css(selector)
+            if title_elem:
+                return title_elem[0].text.strip()
+
+        logger.warning("Could not find track title, using default")
+        return "Unknown Track"
+
     def get_tracklist(self, url: str) -> List[Dict[str, Any]]:
         """
         Fetch and parse tracklist data from a 1001tracklists URL.
