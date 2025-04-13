@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 from scrapling.parser import Adaptor
 
-from src.tracklist_chapter_fetch.scraper import TracklistScraper
+from src.tracklist_chapter_fetch.scraper import ScrapingError, TracklistScraper
 
 
 class TestScraper(unittest.TestCase):
@@ -68,6 +68,20 @@ class TestScraper(unittest.TestCase):
         # Assertions
         self.assertIsInstance(result, Adaptor)
         mock_requests_get.assert_called_once()
+
+    @patch("src.tracklist_chapter_fetch.scraper.requests.get")
+    def test_fetch_page_error(self, mock_requests_get):
+        """Test error handling when fetching fails."""
+        # Setup mock response for error
+        mock_response = MagicMock()
+        mock_response.status_code = 404
+
+        # Setup mock requests.get
+        mock_requests_get.return_value = mock_response
+
+        # Test function with exception
+        with self.assertRaises(ScrapingError):
+            self.scraper.fetch_page("https://www.1001tracklists.com/nonexistent")
 
 
 if __name__ == "__main__":
