@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from src.tracklist_chapter_fetch.cli import main, parse_args
+from src.tracklist_chapter_fetch.metadata import MetadataError
 from src.tracklist_chapter_fetch.scraper import ScrapingError
 from src.tracklist_chapter_fetch.utils import ValidationError
 
@@ -91,6 +92,24 @@ class TestCLI(unittest.TestCase):
         result = main(["https://www.1001tracklists.com/test"])
 
         self.assertEqual(result, 2)  # Should return scraping error code
+
+    @patch("src.tracklist_chapter_fetch.cli.validate_url")
+    @patch("src.tracklist_chapter_fetch.cli.TracklistScraper")
+    @patch("src.tracklist_chapter_fetch.cli.generate_ffmetadata")
+    def test_main_metadata_error(self, mock_generate, mock_scraper, mock_validate):
+        """Test handling of metadata generation errors."""
+        mock_validate.return_value = True
+
+        mock_scraper_instance = MagicMock()
+        mock_tracks = [{"artist": "Artist1", "title": "Title1", "timestamp": "0:34"}]
+        mock_scraper_instance.get_tracklist.return_value = mock_tracks
+        mock_scraper.return_value = mock_scraper_instance
+
+        mock_generate.side_effect = MetadataError("Metadata generation failed")
+
+        result = main(["https://www.1001tracklists.com/test"])
+
+        self.assertEqual(result, 3)  # Should return metadata error code
 
 
 if __name__ == "__main__":
