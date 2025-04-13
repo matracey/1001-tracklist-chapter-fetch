@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from src.tracklist_chapter_fetch.cli import main, parse_args
+from src.tracklist_chapter_fetch.utils import ValidationError
 
 
 class TestCLI(unittest.TestCase):
@@ -64,6 +65,15 @@ class TestCLI(unittest.TestCase):
         mock_scraper_instance.get_tracklist.assert_called_once()
         mock_generate.assert_called_once_with(mock_tracks)
         mock_save.assert_called_once_with(mock_metadata, "test.ffmetadata")
+
+    @patch("src.tracklist_chapter_fetch.cli.validate_url")
+    def test_main_validation_error(self, mock_validate):
+        """Test handling of validation errors."""
+        mock_validate.side_effect = ValidationError("Invalid URL")
+
+        result = main(["http://invalid.url"])
+
+        self.assertEqual(result, 1)  # Should return validation error code
 
 
 if __name__ == "__main__":
