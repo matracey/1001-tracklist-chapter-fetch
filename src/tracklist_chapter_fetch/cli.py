@@ -7,6 +7,7 @@ import sys
 import traceback
 from typing import List, Optional
 
+from .metadata import MetadataError, generate_ffmetadata, save_metadata_to_file
 from .scraper import ScrapingError, TracklistScraper
 from .utils import ValidationError, logger, setup_logging, validate_url
 
@@ -74,6 +75,14 @@ def main(args: Optional[List[str]] = None) -> int:
         scraper = TracklistScraper()
         tracks = scraper.get_tracklist(parsed_args.url)
 
+        # Generate metadata
+        logger.info("Generating FFMETADATA...")
+        metadata = generate_ffmetadata(tracks)
+
+        # Save metadata to file
+        save_metadata_to_file(metadata, parsed_args.output_file)
+
+        logger.info("Successfully processed %d tracks", len(tracks))
         return 0
 
     except ValidationError as e:
@@ -82,6 +91,9 @@ def main(args: Optional[List[str]] = None) -> int:
     except ScrapingError as e:
         logger.error("Scraping error: %s", str(e))
         return 2
+    except MetadataError as e:
+        logger.error("Metadata error: %s", str(e))
+        return 3
     except (OSError, RuntimeError) as e:
         logger.error("Unexpected error: %s", str(e))
         if parsed_args.verbose:
