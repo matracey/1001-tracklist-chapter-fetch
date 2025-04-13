@@ -2,6 +2,7 @@
 FFMETADATA generation module for creating chapter metadata files.
 """
 
+import os
 from typing import Any, Dict, List, Optional, Tuple
 
 from .utils import format_time_ms, logger
@@ -187,3 +188,31 @@ def generate_ffmetadata(tracks: List[Dict[str, Any]]) -> str:
         raise MetadataError("No valid chapters could be generated")
 
     return "\n".join(metadata)
+
+
+def save_metadata_to_file(metadata: str, output_path: str) -> None:
+    """
+    Save metadata string to a file.
+
+    Args:
+        metadata: String in FFMETADATA format
+        output_path: Path to save the metadata file
+
+    Raises:
+        MetadataError: If file write operation fails
+    """
+    try:
+        logger.debug("Saving metadata to %s", output_path)
+
+        # Create directory if it doesn't exist
+        directory = os.path.dirname(output_path)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory)
+
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(metadata)
+
+        logger.info("Successfully saved metadata to %s", output_path)
+
+    except OSError as e:
+        raise MetadataError(f"Failed to save metadata file: {str(e)}") from e
