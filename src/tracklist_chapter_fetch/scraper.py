@@ -2,6 +2,7 @@
 Web scraping functionality for extracting tracklists from 1001tracklists.com.
 """
 
+import re
 import time
 from typing import Any, Dict, List
 
@@ -58,6 +59,29 @@ class TracklistScraper:
             return Adaptor(response.text)
         except requests.RequestException as e:
             raise ScrapingError(f"Error fetching page: {str(e)}") from e
+
+    def __extract_timestamp__(self, item: Any, selectors: List[str]) -> str:
+        """
+        Extract the timestamp from a track item.
+
+        Args:
+            item: Track item element
+            selectors: List of CSS selectors to try
+
+        Returns:
+            The extracted timestamp
+        """
+        for selector in selectors:
+            timestamp_elem = item.css(selector)
+            if timestamp_elem:
+                return timestamp_elem[0].text.strip()
+
+        all_text = item.text
+        time_match = re.search(r"\d+:\d+", all_text)
+        if time_match:
+            return time_match.group(0)
+
+        return None
 
     def __extract_title__(self, item: Any, selectors: List[str]) -> str:
         """
