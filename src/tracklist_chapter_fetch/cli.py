@@ -7,6 +7,7 @@ import sys
 import traceback
 from typing import List, Optional
 
+from .scraper import ScrapingError, TracklistScraper
 from .utils import ValidationError, logger, setup_logging, validate_url
 
 
@@ -68,11 +69,19 @@ def main(args: Optional[List[str]] = None) -> int:
         logger.info("Processing tracklist URL: %s", parsed_args.url)
         validate_url(parsed_args.url)
 
+        # Initialize scraper and fetch tracklist
+        logger.info("Fetching tracklist data...")
+        scraper = TracklistScraper()
+        tracks = scraper.get_tracklist(parsed_args.url)
+
         return 0
 
     except ValidationError as e:
         logger.error("Validation error: %s", str(e))
         return 1
+    except ScrapingError as e:
+        logger.error("Scraping error: %s", str(e))
+        return 2
     except (OSError, RuntimeError) as e:
         logger.error("Unexpected error: %s", str(e))
         if parsed_args.verbose:
