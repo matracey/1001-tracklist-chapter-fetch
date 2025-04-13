@@ -98,3 +98,24 @@ def __format_chapter_title__(track: Dict[str, Any]) -> str:
     if artist:
         return f"{artist} - {title}"
     return title
+
+
+def __create_chapter_metadata__(start_ms: int, end_ms: int, title: str) -> List[str]:
+    """
+    Create metadata lines for a single chapter.
+
+    Args:
+        start_ms: Start time in milliseconds
+        end_ms: End time in milliseconds
+        title: Chapter title
+
+    Returns:
+        List of metadata strings for the chapter
+    """
+    return [
+        "[CHAPTER]",
+        "TIMEBASE=1/1000",
+        f"START={start_ms}",
+        f"END={end_ms}",
+        f"title={title}",
+    ]
