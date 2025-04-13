@@ -60,6 +60,46 @@ class TracklistScraper:
         except requests.RequestException as e:
             raise ScrapingError(f"Error fetching page: {str(e)}") from e
 
+    def __find_tracklist_container__(self, adaptor: Adaptor) -> Any:
+        """
+        Find the main tracklist container in the HTML content.
+
+        Args:
+            adaptor: Adaptor object containing the HTML content
+
+        Returns:
+            The tracklist container element
+
+        Raises:
+            ScrapingError: If no container is found
+        """
+        container_selectors = [
+            ".tlpContainer",
+            "#tlp_container",
+            ".tlpItemsContainer",
+            "#tlplist",
+            ".tl-container",
+        ]
+
+        for selector in container_selectors:
+            container = adaptor.css(selector)
+            if container:
+                logger.debug("Found tracklist container using selector: %s", selector)
+                return container[0]
+
+        logger.debug("Attempting to find track items directly...")
+        track_selectors = [".tlpItem", ".tl-item", ".tracklistItem", "[data-track]"]
+
+        for selector in track_selectors:
+            track_items = adaptor.css(selector)
+            if track_items:
+                logger.debug("Found track items directly with selector: %s", selector)
+                return adaptor
+
+        logger.debug("HTML structure sample:")
+        logger.debug("%s...", adaptor.body[:500])
+        raise ScrapingError("Could not find tracklist container in the page")
+
     def __find_track_items__(self, adaptor: Adaptor, container: Any) -> List[Any]:
         """
         Find all track items within the tracklist container.
