@@ -4,7 +4,7 @@ Tests for the metadata module.
 
 import unittest
 
-from src.tracklist_chapter_fetch.metadata import generate_ffmetadata
+from src.tracklist_chapter_fetch.metadata import MetadataError, generate_ffmetadata
 
 
 class TestMetadata(unittest.TestCase):
@@ -33,6 +33,11 @@ class TestMetadata(unittest.TestCase):
         self.assertIn("START=34000", metadata)
         self.assertIn("START=233000", metadata)  # 3:53 = 233000ms
         self.assertIn("START=462000", metadata)  # 7:42 = 462000ms
+
+    def test_generate_ffmetadata_empty(self):
+        """Test error handling with empty track list."""
+        with self.assertRaises(MetadataError):
+            generate_ffmetadata([])
 
 
 if __name__ == "__main__":
