@@ -146,5 +146,17 @@ class TestScraper(unittest.TestCase):
 
         return mock_item
 
+    def test_parse_tracklist_empty(self):
+        """Test error handling with invalid HTML."""
+        # Setup mock adaptor that finds no tracklist
+        mock_adaptor = MagicMock(spec=Adaptor)
+        mock_adaptor.body = "<html><body>No tracklist here</body></html>"
+
+        # No containers or items found
+        mock_adaptor.css.return_value = []
+
+        with self.assertRaises(ScrapingError):
+            self.scraper.parse_tracklist(mock_adaptor)
+
 if __name__ == "__main__":
     unittest.main()
