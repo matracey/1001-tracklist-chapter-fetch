@@ -60,6 +60,29 @@ class TracklistScraper:
         except requests.RequestException as e:
             raise ScrapingError(f"Error fetching page: {str(e)}") from e
 
+    def parse_tracklist(self, adaptor: Adaptor) -> List[Dict[str, Any]]:
+        """
+        Extract tracks from 1001tracklists HTML content using Scrapling.
+
+        Args:
+            adaptor: Adaptor object containing the HTML content
+
+        Returns:
+            List of track dictionaries with 'artist', 'title', and 'timestamp' fields
+
+        Raises:
+            ScrapingError: If parsing fails
+        """
+        logger.debug("Parsing tracklist content...")
+
+        try:
+            tracklist_container = self.__find_tracklist_container__(adaptor)
+            track_items = self.__find_track_items__(adaptor, tracklist_container)
+            tracks = self.__extract_tracks__(track_items)
+            return tracks
+        except (AttributeError, IndexError, ValueError) as e:
+            raise ScrapingError(f"Failed to parse tracklist: {str(e)}") from e
+
     def __find_tracklist_container__(self, adaptor: Adaptor) -> Any:
         """
         Find the main tracklist container in the HTML content.
@@ -238,6 +261,6 @@ class TracklistScraper:
         """
         try:
             page_adaptor = self.fetch_page(url)
-            return {}
+            return self.parse_tracklist(page_adaptor)
         except Exception as e:
             raise ScrapingError(f"Failed to parse tracklist: {str(e)}") from e
