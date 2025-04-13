@@ -157,3 +157,33 @@ def __process_track__(
         logger.warning("Type error in track %d: %s", track_index + 1, str(e))
 
     return None
+
+
+def generate_ffmetadata(tracks: List[Dict[str, Any]]) -> str:
+    """
+    Generate FFMETADATA format string from track list.
+
+    Args:
+        tracks: List of track dictionaries with 'artist', 'title', and 'timestamp' fields
+
+    Returns:
+        String in FFMETADATA format
+
+    Raises:
+        MetadataError: If metadata generation fails
+    """
+    __validate_tracks__(tracks)
+
+    # Start with FFMETADATA header
+    metadata = [";FFMETADATA1"]
+
+    # Process each track to create chapter entries
+    for i, track in enumerate(tracks):
+        chapter_metadata = __process_track__(track, i, tracks)
+        if chapter_metadata:
+            metadata.extend(chapter_metadata)
+
+    if len(metadata) <= 1:
+        raise MetadataError("No valid chapters could be generated")
+
+    return "\n".join(metadata)
