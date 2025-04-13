@@ -119,3 +119,41 @@ def __create_chapter_metadata__(start_ms: int, end_ms: int, title: str) -> List[
         f"END={end_ms}",
         f"title={title}",
     ]
+
+
+def __process_track__(
+    track: Dict[str, Any], track_index: int, tracks: List[Dict[str, Any]]
+) -> Optional[List[str]]:
+    """
+    Process a single track and generate its chapter metadata.
+
+    Args:
+        track: Track dictionary
+        track_index: Index of the track in the tracks list
+        tracks: Complete list of tracks
+
+    Returns:
+        List of metadata strings for the track or None if track processing fails
+    """
+    try:
+        # Get timing information
+        timing_result = __get_track_timings__(track, track_index, tracks)
+        if timing_result is None:
+            return None
+
+        start_ms, end_ms = timing_result
+
+        # Format chapter title
+        chapter_title = __format_chapter_title__(track)
+
+        # Create chapter metadata
+        return __create_chapter_metadata__(start_ms, end_ms, chapter_title)
+
+    except KeyError as e:
+        logger.warning("Missing key in track %d: %s", track_index + 1, str(e))
+    except ValueError as e:
+        logger.warning("Invalid value in track %d: %s", track_index + 1, str(e))
+    except TypeError as e:
+        logger.warning("Type error in track %d: %s", track_index + 1, str(e))
+
+    return None
