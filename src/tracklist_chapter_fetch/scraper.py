@@ -60,6 +60,41 @@ class TracklistScraper:
         except requests.RequestException as e:
             raise ScrapingError(f"Error fetching page: {str(e)}") from e
 
+    def __find_track_items__(self, adaptor: Adaptor, container: Any) -> List[Any]:
+        """
+        Find all track items within the tracklist container.
+
+        Args:
+            adaptor: Adaptor object containing the HTML content
+            container: The tracklist container element
+
+        Returns:
+            List of track item elements
+
+        Raises:
+            ScrapingError: If no track items are found
+        """
+        track_item_selectors = [
+            ".tlpItem",
+            ".tl-item",
+            ".tracklistItem",
+            "[data-track]",
+        ]
+
+        for selector in track_item_selectors:
+            items = (
+                container.css(selector)
+                if container != adaptor
+                else adaptor.css(selector)
+            )
+            if items:
+                logger.debug(
+                    "Found %d track items using selector: %s", len(items), selector
+                )
+                return items
+
+        raise ScrapingError("No track items found in the tracklist")
+
     def __extract_tracks__(self, track_items: List[Any]) -> List[Dict[str, Any]]:
         """
         Extract track information from track items.
